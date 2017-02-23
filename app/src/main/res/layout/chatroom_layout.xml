@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#f0f0f0"
+
+    >
+
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true"
+        android:scrollbars="none"
+        >
+        <!--
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/msg_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            ></android.support.v7.widget.RecyclerView>
+            -->
+        <TextView
+            android:id="@+id/msgshow_textView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+    </ScrollView>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+        <EditText
+            android:id="@+id/inputmsg_editxt"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
+            android:background="#ffffff"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
+            android:paddingStart="4dp"
+            android:maxLines="30"
+            android:textSize="18sp"
+            tools:text="输入消息内容"
+            />
+
+        <Button
+            android:id="@+id/sendmsg_btn"
+            android:layout_width="68dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginRight="8dp"
+            android:text="@string/sendMsg_btn"
+            android:textSize="18sp"
+            />
+    </LinearLayout>
+
+</LinearLayout>
+
