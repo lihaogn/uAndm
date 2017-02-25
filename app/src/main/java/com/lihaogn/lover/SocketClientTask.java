@@ -1,6 +1,7 @@
 package com.lihaogn.lover;
 
 import android.os.AsyncTask;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -36,7 +37,7 @@ public class SocketClientTask extends AsyncTask<Socket,String,Boolean> {
             // 不断读取Socket输入流的内容，接收sever传来的文本
             while ((content = br.readLine()) != null) {
                 // 返回文本数据
-                publishProgress(content);
+                    publishProgress(content);
             }
         } catch (IOException e) {
             e.printStackTrace();
