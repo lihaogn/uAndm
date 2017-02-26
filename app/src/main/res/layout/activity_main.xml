@@ -13,11 +13,12 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         >
-        <ImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/nav_touxiang"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
             android:src="@drawable/cat"
-            android:layout_gravity="center_horizontal"
+            android:layout_gravity="center"
             android:layout_marginTop="30dp"
             android:layout_marginBottom="15dp"
             />

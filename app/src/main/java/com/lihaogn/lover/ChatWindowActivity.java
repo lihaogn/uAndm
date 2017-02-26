@@ -46,6 +46,9 @@ public class ChatWindowActivity extends AppCompatActivity {
     Button sendMsgButton;
     // 滑动菜单
     private DrawerLayout mDrawerLayout;
+    // 反馈 连接已经断掉
+    static boolean connectError=false;
+
 
 
     @Override
@@ -97,17 +100,30 @@ public class ChatWindowActivity extends AppCompatActivity {
                 String msg = inputMsgEditput.getText().toString();
                 // 如果输入不为空
                 if (msg != null) {
-                    // 清空input文本框数据
-                    inputMsgEditput.setText("");
-                    // 向服务端发送 聊天信息
-                    try {
-                        // 将用户在文本框内输入的内容写入网络
-                        //os.write((input.getText().toString() + "\r\n").getBytes());
-                        MainActivity.mPrintWriter.println(msg);
-                        MainActivity.mPrintWriter.flush();
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    // 判断 socket 是否连接成功
+                    if (MainActivity.linkedOkTAG == true) {
+                        // 判断连接是否异常
+                        if (connectError == false) {
+                            // 清空input文本框数据
+                            inputMsgEditput.setText("");
+                            // 向服务端发送 聊天信息
+                            try {
+                                // 将用户在文本框内输入的内容写入网络
+                                //os.write((input.getText().toString() + "\r\n").getBytes());
+
+                                MainActivity.mPrintWriter.println(msg);
+                                MainActivity.mPrintWriter.flush();
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            Toast.makeText(ChatWindowActivity.this, "连接失败。。。请检查网络", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toast.makeText(ChatWindowActivity.this, "连接失败。。。请检查网络", Toast.LENGTH_SHORT).show();
                     }
+
                 }
             }
         });
@@ -118,9 +134,11 @@ public class ChatWindowActivity extends AppCompatActivity {
         super.onDestroy();
 
         Log.d(TAG, "onDestroy: is working----------------------------------------------------------------------------");
-        // 发送关闭次client的socket
-        MainActivity.mPrintWriter.println("exit this chat");
-        MainActivity.mPrintWriter.flush();
+        if (MainActivity.linkedOkTAG == true) {
+            // 发送关闭次client的socket
+            MainActivity.mPrintWriter.println("exit this chat");
+            MainActivity.mPrintWriter.flush();
+        }
         // 清空input文本框数据
         inputMsgEditput.setText("");
 
@@ -143,4 +161,5 @@ public class ChatWindowActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.toolbar, menu);
         return true;
     }
+
 }

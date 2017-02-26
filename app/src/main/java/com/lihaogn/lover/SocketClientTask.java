@@ -36,11 +36,20 @@ public class SocketClientTask extends AsyncTask<Socket,String,Boolean> {
             br = new BufferedReader(new InputStreamReader(socket.getInputStream(),"utf-8"));
             // 不断读取Socket输入流的内容，接收sever传来的文本
             while ((content = br.readLine()) != null) {
-                // 返回文本数据
-                    publishProgress(content);
+                // 去界面中打印发来的消息
+                publishProgress(content);
             }
         } catch (IOException e) {
             e.printStackTrace();
+            // 连接断掉标志
+            ChatWindowActivity.connectError = true;
+            try {
+                MainActivity.mPrintWriter.close();
+                socket.close();
+                MainActivity.linkedOkTAG=false;
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
         }
         return null;
     }
@@ -49,6 +58,11 @@ public class SocketClientTask extends AsyncTask<Socket,String,Boolean> {
     protected void onProgressUpdate(String... values) {
         // 在这里可以更新ui上的信息
         String content = values[0];
-        ChatWindowActivity.showMsgTextView.append("\n"+content);
+        ChatWindowActivity.showMsgTextView.append("\n" + content);
+    }
+
+    @Override
+    protected void onCancelled() {
+        super.onCancelled();
     }
 }

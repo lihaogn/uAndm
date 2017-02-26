@@ -13,11 +13,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
@@ -29,14 +31,18 @@ public class MainActivity extends AppCompatActivity {
     // 输出流，用于向服务端发信息
     static PrintWriter mPrintWriter;
     // 定义一个socket，客户端socket
-    Socket mClientSocket;
+    static Socket mClientSocket;
+
+    // 连接成功标志
+    static boolean linkedOkTAG=false;
 
     // 服务端IP地址
     private static final String SERVER_IP = "192.168.31.167";
     // 用户标志：用于识别是哪一个用户
-    private static final String USER_TAG2= "USER:wangyi";
-    private static final String USER_TAG1 = "USER:Lihao";
-    String userId;
+     static final String USER_TAG2= "USER:wangyi";
+     static final String USER_TAG1 = "USER:Lihao";
+
+    static String userId;
     String password;
 
 
@@ -53,6 +59,52 @@ public class MainActivity extends AppCompatActivity {
     private EditText pwdEditText;
     // 登录错误提示信息
     private TextView errorTextView;
+
+    //-------------------- 我的方法 ----------------------------------------------------------
+    private void sendClientTAG() {
+        // 首先传送客户端标志，用来识别客户
+        if (userId.equals(USERNAME1)) {
+            mPrintWriter.println(USER_TAG1);
+        } else if (userId.equals(USERNAME2)) {
+            mPrintWriter.println(USER_TAG2);
+        }
+        mPrintWriter.flush();
+    }
+
+    // 连接服务端
+    void linkServer() {
+        try {
+            mClientSocket= new Socket(SERVER_IP, 52121);
+            // --------------获取输出流，用于传信息给server------------------------------
+            // os = socket.getOutputStream();
+            if (mClientSocket.isConnected()) {
+                linkedOkTAG=true;
+                mPrintWriter = new PrintWriter(
+                        new BufferedWriter(
+                                new OutputStreamWriter(mClientSocket.getOutputStream(), "utf-8")));
+                //传送客户端标志，用来识别客户
+                sendClientTAG();
+
+                // -------------客户端启动服务线程，不断读取来自服务器的数据------------------
+                // 如果线程为空,则启动线程工作
+                if (mSocketClientTask == null) {
+                    // 新建实例并启动线程
+                    mSocketClientTask = new SocketClientTask();
+                    mSocketClientTask.execute(mClientSocket);
+                }
+            }
+
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+    //------------------------------------------------------------------------------
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,40 +130,15 @@ public class MainActivity extends AppCompatActivity {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            try {
-                                // 连接服务端
-                                mClientSocket= new Socket(SERVER_IP, 52121);
-                                // --------------获取输出流，用于传信息给server------------------------------
-                                // os = socket.getOutputStream();
-                                mPrintWriter = new PrintWriter(
-                                        new BufferedWriter(
-                                                new OutputStreamWriter(mClientSocket.getOutputStream(), "utf-8")));
-                                // 传送客户端标志，用来识别客户
-                                if (userId.equals(USERNAME1)) {
-                                    mPrintWriter.println(USER_TAG1);
-                                } else if (userId.equals(USERNAME2)) {
-                                    mPrintWriter.println(USER_TAG2);
-                                }
-                                mPrintWriter.flush();
-                                // -------------客户端启动服务线程，不断读取来自服务器的数据------------------
-                                // 如果线程为空,则启动线程工作
-                                if (mSocketClientTask == null) {
-                                    // 新建实例并启动线程
-                                    mSocketClientTask=new SocketClientTask();
-                                    mSocketClientTask.execute(mClientSocket);
-                                }
+                            // 连接服务端
+                            linkServer();
 
-                            } catch (UnknownHostException e) {
-                                e.printStackTrace();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
                         }
                     }).start();
+                        // 转到聊天活动界面
+                        Intent chatIntent = new Intent(MainActivity.this, ChatWindowActivity.class);
+                        startActivity(chatIntent);
 
-                    // 转到聊天活动界面
-                    Intent chatIntent = new Intent(MainActivity.this, ChatWindowActivity.class);
-                    startActivity(chatIntent);
                     //------------------------------------------------------------------------------
                 } else {
                     errorTextView.setVisibility(View.VISIBLE);
